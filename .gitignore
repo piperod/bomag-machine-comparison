@@ -40,4 +40,10 @@ Thumbs.db
 # Project specific
 *.xlsx
 *.xls
-*.csv 
+*.csv
+
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata 
