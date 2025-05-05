@@ -1,0 +1,20 @@
+// Custom variables
+$bomag-yellow: #FFD700;
+$bomag-dark: #1A1A1A;
+$bomag-light: #F8F8F8;
+
+// Custom styles
+.bg-bomag-yellow {
+  background-color: $bomag-yellow !important;
+}
+
+.text-bomag-dark {
+  color: $bomag-dark !important;
+}
+
+.bg-bomag-light {
+  background-color: $bomag-light !important;
+}
+
+// Import the minima theme's styles
+@use "minima"; 

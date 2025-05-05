@@ -1,0 +1,19 @@
+/* Custom variables */
+:root {
+  --bomag-yellow: #FFD700;
+  --bomag-dark: #1A1A1A;
+  --bomag-light: #F8F8F8;
+}
+
+/* Custom styles */
+.bg-bomag-yellow {
+  background-color: var(--bomag-yellow) !important;
+}
+
+.text-bomag-dark {
+  color: var(--bomag-dark) !important;
+}
+
+.bg-bomag-light {
+  background-color: var(--bomag-light) !important;
+} 
