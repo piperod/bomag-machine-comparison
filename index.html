@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOMAG Machine Comparison Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bomag: {
+                            yellow: '#FFD700',
+                            dark: '#1A1A1A',
+                            light: '#F8F8F8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .machine-card {
+            transition: all 0.3s ease;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .machine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .comparison-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 2rem;
+        }
+        .comparison-table th {
+            position: sticky;
+            top: 0;
+            background-color: #1A1A1A;
+            z-index: 10;
+            padding: 1rem;
+            color: white;
+        }
+        .comparison-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .comparison-table tr:hover td {
+            background-color: #fff8e6;
+        }
+        .comparison-table td:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .comparison-table td:nth-child(even) {
+            background-color: #fff8e6;
+        }
+        .comparison-table th:first-child {
+            background-color: #1A1A1A;
+            text-align: left;
+        }
+        .comparison-table .section-header {
+            background-color: #FFD700 !important;
+            color: #1A1A1A;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .comparison-table .highlight {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+        .machine-logo {
+            max-width: 120px;
+            max-height: 60px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+        .machine-image {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            margin: 1rem 0;
+        }
+        .machine-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 0.5rem;
+        }
+        .machine-model {
+            color: #6B7280;
+            font-size: 1rem;
+        }
+        .search-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .add-machine-btn {
+            transition: all 0.3s ease;
+        }
+        .add-machine-btn:hover {
+            transform: scale(1.05);
+        }
+        .remove-machine-btn {
+            transition: all 0.2s ease;
+        }
+        .remove-machine-btn:hover {
+            transform: scale(1.1);
+            color: #dc2626;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #FFD700;
+            color: #1A1A1A;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-bomag-yellow text-bomag-dark py-4 shadow-md">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="assets/bomag-logo.png" alt="BOMAG Logo" class="h-10 mr-4">
+                <h1 class="text-2xl font-bold">Machine Comparison Tool</h1>
+            </div>
+            <div class="hidden md:block">
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-white">Home</a></li>
+                        <li><a href="#" class="hover:text-white">Products</a></li>
+                        <li><a href="#" class="hover:text-white">Support</a></li>
+                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-bomag-dark">Compare BOMAG Machines</h2>
+            <p class="text-gray-600 mb-6">Select a machine category and compare specifications side by side.</p>
+            
+            <!-- Category Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6" id="categoryTabs">
+                <!-- Tabs will be added here dynamically -->
+            </div>
+            
+            <!-- Machine Selection Section -->
+            <div class="bg-bomag-light p-4 rounded-lg mb-6">
+                <div class="flex flex-wrap gap-4 mb-4" id="machineSelectors">
+                    <!-- Machine selectors will be added here -->
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <button id="addMachineBtn" class="add-machine-btn bg-bomag-yellow text-bomag-dark font-medium py-2 px-4 rounded-full flex items-center hover:bg-yellow-500 transition">
+                        <i class="fas fa-plus mr-2"></i> Add Another Machine
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-bomag-light p-4 rounded-lg mb-6 hidden" id="noSelectionMessage">
+                <p class="text-center text-gray-600">Please select at least two machines to compare.</p>
+            </div>
+            
+            <!-- Machine Cards Display (after submission) -->
+            <div class="hidden" id="machineCardsContainer">
+                <h3 class="text-lg font-semibold mb-4 text-bomag-dark">Selected Machines</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" id="machineCards">
+                    <!-- Machine cards will be added here -->
+                </div>
+            </div>
+            
+            <!-- Comparison Results -->
+            <div class="overflow-x-auto" id="comparisonResults">
+                <!-- Comparison table will be added here -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-bomag-dark text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <img src="assets/logos/bomag.png" alt="BOMAG Logo" class="h-8">
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm text-gray-300">© 2023 BOMAG GmbH. All rights reserved.</p>
+                    <p class="text-xs text-gray-400 mt-1">Specifications subject to change without notice.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Load machine data from JSON
+        let machineData = {};
+        let currentCategory = '';
+        let selectedMachines = [];
+        const maxMachines = 4;
+
+        // Fetch the machine data
+        fetch('http://localhost:8000/machine_data.json')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Loaded machine data:', data);
+                machineData = data;
+                initializeTabs();
+                
+                // Pre-select HAMM and Caterpillar machines for comparison
+                currentCategory = 'LTR';  // Set initial category
+                selectedMachines = ['HAMM', 'CATERPILLAR'];  // Pre-select these manufacturers
+                
+                // Update UI to reflect pre-selected machines
+                const selectorsContainer = document.getElementById('machineSelectors');
+                selectorsContainer.innerHTML = '';  // Clear existing selectors
+                
+                // Add selectors for pre-selected machines
+                selectedMachines.forEach((manufacturer, index) => {
+                    const selectorId = `machine-selector-${Date.now() + index}`;
+                    const selectorHTML = `
+                        <div class="machine-card bg-white rounded-lg shadow-sm p-4 w-full md:w-64 relative" id="${selectorId}">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-bomag-dark">Machine ${index + 1}</h3>
+                                ${index > 1 ? `
+                                    <button class="remove-machine-btn text-gray-400 hover:text-red-500" onclick="removeMachineSelector('${selectorId}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <select class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-bomag-yellow focus:border-transparent"
+                                    onchange="selectMachine('${selectorId}', this.value)">
+                                <option value="">Select a machine...</option>
+                                ${getMachineOptions()}
+                            </select>
+                        </div>
+                    `;
+                    selectorsContainer.insertAdjacentHTML('beforeend', selectorHTML);
+                    
+                    // Set the selected value
+                    const select = document.querySelector(`#${selectorId} select`);
+                    select.value = manufacturer;
+                });
+                
+                // Compare the pre-selected machines
+                compareMachines();
+            })
+            .catch(error => {
+                console.error('Error loading data:', error);
+                document.getElementById('categoryTabs').innerHTML = '<p class="text-red-500">Error loading data. Please check the console for details.</p>';
+            });
+
+        function initializeTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = ''; // Clear existing tabs
+            
+            // Create tabs for each category
+            Object.keys(machineData).forEach((category, index) => {
+                const tab = document.createElement('button');
+                tab.className = `tab-button px-4 py-2 rounded-full border border-bomag-dark text-bomag-dark font-medium hover:bg-bomag-yellow transition ${index === 0 ? 'active' : ''}`;
+                tab.textContent = category;
+                tab.onclick = () => switchCategory(category);
+                tabsContainer.appendChild(tab);
+            });
+
+            // Activate first tab
+            if (Object.keys(machineData).length > 0) {
+                switchCategory(Object.keys(machineData)[0]);
+            }
+        }
+
+        function switchCategory(category) {
+            console.log('Switching to category:', category);
+            currentCategory = category;
+            selectedMachines = [];
+            
+            // Update tab styling
+            document.querySelectorAll('.tab-button').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent === category) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Reset machine selectors
+            const selectorsContainer = document.getElementById('machineSelectors');
+            selectorsContainer.innerHTML = '';
+            
+            // Add initial selectors
+            addMachineSelector();
+            addMachineSelector();
+
+            // Clear comparison results
+            document.getElementById('comparisonResults').innerHTML = '';
+            document.getElementById('machineCardsContainer').classList.add('hidden');
+            document.getElementById('noSelectionMessage').classList.add('hidden');
+        }
+
+        function addMachineSelector() {
+            if (selectedMachines.length >= maxMachines) {
+                alert(`Maximum of ${maxMachines} machines can be compared at once.`);
+                return;
+            }
+
+            const selectorId = `machine-selector-${Date.now()}`;
+            const selectorHTML = `
+                <div class="machine-card bg-white rounded-lg shadow-sm p-4 w-full md:w-64 relative" id="${selectorId}">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-medium text-bomag-dark">Machine ${selectedMachines.length + 1}</h3>
+                        ${selectedMachines.length > 1 ? `
+                            <button class="remove-machine-btn text-gray-400 hover:text-red-500" onclick="removeMachineSelector('${selectorId}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                    <select class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-bomag-yellow focus:border-transparent"
+                            onchange="selectMachine('${selectorId}', this.value)">
+                        <option value="">Select a machine...</option>
+                        ${getMachineOptions()}
+                    </select>
+                </div>
+            `;
+            
+            document.getElementById('machineSelectors').insertAdjacentHTML('beforeend', selectorHTML);
+            selectedMachines.push(''); // Add empty string for the new selector
+            console.log('Added new selector, selectedMachines:', selectedMachines);
+        }
+
+        function removeMachineSelector(selectorId) {
+            const element = document.getElementById(selectorId);
+            if (element) {
+                const index = Array.from(element.parentNode.children).indexOf(element);
+                selectedMachines.splice(index, 1);
+                element.remove();
+                console.log('Removed selector, selectedMachines:', selectedMachines);
+                compareMachines();
+            }
+        }
+
+        function selectMachine(selectorId, manufacturer) {
+            console.log('Selecting machine:', manufacturer, 'for selector:', selectorId);
+            const element = document.getElementById(selectorId);
+            const index = Array.from(element.parentNode.children).indexOf(element);
+            selectedMachines[index] = manufacturer;
+            console.log('Updated selectedMachines:', selectedMachines);
+            compareMachines();
+        }
+
+        function getMachineOptions() {
+            if (!machineData[currentCategory]) {
+                console.error('No machines found for category:', currentCategory);
+                return '';
+            }
+            
+            return Object.entries(machineData[currentCategory])
+                .map(([manufacturer, data]) => `<option value="${manufacturer}">${manufacturer} - ${data.Modelo}</option>`)
+                .join('');
+        }
+
+        function getLogoUrl(manufacturer) {
+            // First try the exact manufacturer name
+            const key = manufacturer.toLowerCase().replace(/\s+/g, '_');
+            
+            // List of available logos (hardcoded based on what we have)
+            const availableLogos = ['hamm', 'caterpillar'];
+            
+            if (availableLogos.includes(key)) {
+                return `assets/logos/${key}.png`;
+            }
+            
+            // Return empty string if no matching logo is found
+            return '';
+        }
+
+        function getMachineImageUrl(manufacturer, model) {
+            // Map manufacturer and model to the correct image file
+            const imageMap = {
+                'HAMM': 'máquina_ca2bf3f6.png',
+                'CATERPILLAR': 'máquina_d24bade1.png',
+                'DYNAPAC': 'máquina_fe5c3684.png',
+                'AMMANN': 'máquina_560fce20.png',
+                'JCB': 'máquina_f1a543f5.png',
+                'WACKER NEUSON': 'máquina_bbd97b00.png'
+            };
+            
+            const imageFile = imageMap[manufacturer] || 'máquina.png';
+            return `assets/${currentCategory}/${imageFile}`;
+        }
+
+        function compareMachines() {
+            console.log('Running compareMachines with:', selectedMachines);
+            const selectedModels = selectedMachines.filter(m => m);
+            console.log('Filtered models:', selectedModels);
+            
+            if (selectedModels.length < 2) {
+                console.log('Not enough machines selected');
+                document.getElementById('noSelectionMessage').classList.remove('hidden');
+                document.getElementById('comparisonResults').innerHTML = '';
+                document.getElementById('machineCardsContainer').classList.add('hidden');
+                return;
+            }
+
+            console.log('Showing comparison for category:', currentCategory);
+            document.getElementById('noSelectionMessage').classList.add('hidden');
+            document.getElementById('machineCardsContainer').classList.remove('hidden');
+
+            // Create machine cards
+            const cardsHTML = selectedModels.map(manufacturer => {
+                const machine = machineData[currentCategory][manufacturer];
+                const logoUrl = getLogoUrl(manufacturer);
+                const machineImageUrl = getMachineImageUrl(manufacturer, machine.Modelo);
+                
+                return `
+                    <div class="machine-card">
+                        ${logoUrl ? `
+                            <img src="${logoUrl}" 
+                                 alt="${manufacturer} logo" 
+                                 class="machine-logo mx-auto">
+                        ` : ''}
+                        <h3 class="machine-name">${manufacturer}</h3>
+                        <p class="machine-model">${machine.Modelo}</p>
+                        <img src="${machineImageUrl}" 
+                             alt="${manufacturer} ${machine.Modelo}" 
+                             class="machine-image"
+                             onerror="this.onerror=null; this.src=''">
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('machineCards').innerHTML = cardsHTML;
+
+            // Create comparison table
+            let tableHTML = `
+                <table class="comparison-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Specification</th>
+                            ${selectedModels.map(manufacturer => {
+                                const machine = machineData[currentCategory][manufacturer];
+                                const logoUrl = getLogoUrl(manufacturer);
+                                const machineImageUrl = getMachineImageUrl(manufacturer, machine.Modelo);
+                                
+                                return `
+                                    <th class="text-center">
+                                        ${logoUrl ? `
+                                            <img src="${logoUrl}" 
+                                                 alt="${manufacturer} logo" 
+                                                 class="machine-logo mx-auto">
+                                        ` : ''}
+                                        <div class="font-semibold">${manufacturer}</div>
+                                        <div class="text-sm text-gray-300">${machine.Modelo}</div>
+                                        <img src="${machineImageUrl}" 
+                                             alt="${manufacturer} ${machine.Modelo}" 
+                                             class="machine-image"
+                                             onerror="this.onerror=null; this.src=''">
+                                    </th>
+                                `;
+                            }).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Get all unique specification keys
+            const firstMachine = machineData[currentCategory][selectedModels[0]];
+            const specs = Object.keys(firstMachine).filter(key => key !== 'Tiempo');
+            console.log('Specifications to compare:', specs);
+
+            // Add regular specifications
+            specs.forEach(spec => {
+                tableHTML += `
+                    <tr>
+                        <td class="highlight">${spec}</td>
+                        ${selectedModels.map(manufacturer => {
+                            const machine = machineData[currentCategory][manufacturer];
+                            const value = machine[spec] || '-';
+                            return `<td class="text-center">${value}</td>`;
+                        }).join('')}
+                    </tr>
+                `;
+            });
+
+            // Add Tiempo section if it exists
+            if (firstMachine.Tiempo) {
+                console.log('Adding Tiempo section');
+                tableHTML += `
+                    <tr>
+                        <td colspan="${selectedModels.length + 1}" class="section-header">
+                            Tiempo
+                        </td>
+                    </tr>
+                `;
+
+                Object.keys(firstMachine.Tiempo).forEach(tiempo => {
+                    tableHTML += `
+                        <tr>
+                            <td class="highlight">${tiempo}</td>
+                            ${selectedModels.map(manufacturer => {
+                                const machine = machineData[currentCategory][manufacturer];
+                                const value = machine.Tiempo[tiempo] || '-';
+                                return `<td class="text-center">${value}</td>`;
+                            }).join('')}
+                        </tr>
+                    `;
+                });
+            }
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            console.log('Setting comparison results');
+            document.getElementById('comparisonResults').innerHTML = tableHTML;
+        }
+
+        // Add event listener for add machine button
+        document.getElementById('addMachineBtn').addEventListener('click', () => {
+            console.log('Add machine button clicked');
+            addMachineSelector();
+        });
+    </script>
+</body>
+</html>
