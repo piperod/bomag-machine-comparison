@@ -188,7 +188,7 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
-                    <img src="assets/logos/bomag.png" alt="BOMAG Logo" class="h-8">
+                    <img src="assets/bomag-logo.png" alt="BOMAG Logo" class="h-8">
                 </div>
                 <div class="text-center md:text-right">
                     <p class="text-sm text-gray-300">© 2023 BOMAG GmbH. All rights reserved.</p>
@@ -206,7 +206,7 @@
         const maxMachines = 4;
 
         // Fetch the machine data
-        fetch('http://localhost:8000/machine_data.json')
+        fetch('machine_data.json')
             .then(response => response.json())
             .then(data => {
                 console.log('Loaded machine data:', data);
@@ -364,33 +364,27 @@
         }
 
         function getLogoUrl(manufacturer) {
-            // First try the exact manufacturer name
-            const key = manufacturer.toLowerCase().replace(/\s+/g, '_');
-            
-            // List of available logos (hardcoded based on what we have)
-            const availableLogos = ['hamm', 'caterpillar'];
-            
-            if (availableLogos.includes(key)) {
-                return `assets/logos/${key}.png`;
-            }
-            
-            // Return empty string if no matching logo is found
-            return '';
+            const logoMap = {
+                'HAMM': 'assets/logos/hamm.png',
+                'CATERPILLAR': 'assets/logos/caterpillar.png',
+                'DYNAPAC': 'assets/logos/dynapac.png',
+                'AMMANN': 'assets/logos/ammann.png',
+                'JCB': 'assets/logos/jcb.png',
+                'WACKER NEUSON': 'assets/logos/wacker.png'
+            };
+            return logoMap[manufacturer] || '';
         }
 
-        function getMachineImageUrl(manufacturer, model) {
-            // Map manufacturer and model to the correct image file
+        function getMachineImageUrl(manufacturer) {
             const imageMap = {
-                'HAMM': 'máquina_ca2bf3f6.png',
-                'CATERPILLAR': 'máquina_d24bade1.png',
-                'DYNAPAC': 'máquina_fe5c3684.png',
-                'AMMANN': 'máquina_560fce20.png',
-                'JCB': 'máquina_f1a543f5.png',
-                'WACKER NEUSON': 'máquina_bbd97b00.png'
+                'HAMM': 'assets/LTR/máquina_ca2bf3f6.png',
+                'CATERPILLAR': 'assets/LTR/máquina_d24bade1.png',
+                'DYNAPAC': 'assets/LTR/máquina_560fce20.png',
+                'AMMANN': 'assets/LTR/máquina_560fce20.png',
+                'JCB': 'assets/LTR/máquina_560fce20.png',
+                'WACKER NEUSON': 'assets/LTR/máquina_560fce20.png'
             };
-            
-            const imageFile = imageMap[manufacturer] || 'máquina.png';
-            return `assets/${currentCategory}/${imageFile}`;
+            return imageMap[manufacturer] || '';
         }
 
         function compareMachines() {
@@ -414,7 +408,7 @@
             const cardsHTML = selectedModels.map(manufacturer => {
                 const machine = machineData[currentCategory][manufacturer];
                 const logoUrl = getLogoUrl(manufacturer);
-                const machineImageUrl = getMachineImageUrl(manufacturer, machine.Modelo);
+                const machineImageUrl = getMachineImageUrl(manufacturer);
                 
                 return `
                     <div class="machine-card">
@@ -443,7 +437,7 @@
                             ${selectedModels.map(manufacturer => {
                                 const machine = machineData[currentCategory][manufacturer];
                                 const logoUrl = getLogoUrl(manufacturer);
-                                const machineImageUrl = getMachineImageUrl(manufacturer, machine.Modelo);
+                                const machineImageUrl = getMachineImageUrl(manufacturer);
                                 
                                 return `
                                     <th class="text-center">
