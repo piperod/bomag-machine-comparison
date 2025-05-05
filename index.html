@@ -4,22 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOMAG Machine Comparison Tool</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        bomag: {
-                            yellow: '#FFD700',
-                            dark: '#1A1A1A',
-                            light: '#F8F8F8'
-                        }
-                    }
-                }
-            }
-        }
+        // Remove tailwind.config as it's not needed with the production build
     </script>
     <style>
         .machine-card {
@@ -123,7 +111,7 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <header class="bg-bomag-yellow text-bomag-dark py-4 shadow-md">
+    <header class="bg-yellow-500 text-gray-900 py-4 shadow-md">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center">
                 <img src="assets/bomag-logo.png" alt="BOMAG Logo" class="h-10 mr-4">
@@ -144,7 +132,7 @@
 
     <main class="container mx-auto px-4 py-8">
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 class="text-xl font-semibold mb-4 text-bomag-dark">Compare BOMAG Machines</h2>
+            <h2 class="text-xl font-semibold mb-4 text-gray-900">Compare BOMAG Machines</h2>
             <p class="text-gray-600 mb-6">Select a machine category and compare specifications side by side.</p>
             
             <!-- Category Tabs -->
@@ -153,25 +141,25 @@
             </div>
             
             <!-- Machine Selection Section -->
-            <div class="bg-bomag-light p-4 rounded-lg mb-6">
+            <div class="bg-gray-100 p-4 rounded-lg mb-6">
                 <div class="flex flex-wrap gap-4 mb-4" id="machineSelectors">
                     <!-- Machine selectors will be added here -->
                 </div>
                 
                 <div class="flex justify-between items-center">
-                    <button id="addMachineBtn" class="add-machine-btn bg-bomag-yellow text-bomag-dark font-medium py-2 px-4 rounded-full flex items-center hover:bg-yellow-500 transition">
+                    <button id="addMachineBtn" class="add-machine-btn bg-yellow-500 text-gray-900 font-medium py-2 px-4 rounded-full flex items-center hover:bg-yellow-400 transition">
                         <i class="fas fa-plus mr-2"></i> Add Another Machine
                     </button>
                 </div>
             </div>
             
-            <div class="bg-bomag-light p-4 rounded-lg mb-6 hidden" id="noSelectionMessage">
+            <div class="bg-gray-100 p-4 rounded-lg mb-6 hidden" id="noSelectionMessage">
                 <p class="text-center text-gray-600">Please select at least two machines to compare.</p>
             </div>
             
             <!-- Machine Cards Display (after submission) -->
             <div class="hidden" id="machineCardsContainer">
-                <h3 class="text-lg font-semibold mb-4 text-bomag-dark">Selected Machines</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-900">Selected Machines</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" id="machineCards">
                     <!-- Machine cards will be added here -->
                 </div>
@@ -184,7 +172,7 @@
         </div>
     </main>
 
-    <footer class="bg-bomag-dark text-white py-6">
+    <footer class="bg-gray-900 text-white py-6">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
@@ -206,8 +194,13 @@
         const maxMachines = 4;
 
         // Fetch the machine data
-        fetch('machine_data.json')
-            .then(response => response.json())
+        fetch('./machine_data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Loaded machine data:', data);
                 machineData = data;
@@ -254,6 +247,7 @@
             .catch(error => {
                 console.error('Error loading data:', error);
                 document.getElementById('categoryTabs').innerHTML = '<p class="text-red-500">Error loading data. Please check the console for details.</p>';
+                document.getElementById('machineSelectors').innerHTML = '<p class="text-red-500">Error loading machine data. Please try again later.</p>';
             });
 
         function initializeTabs() {
