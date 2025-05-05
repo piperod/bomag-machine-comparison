@@ -211,9 +211,7 @@
                 currentCategory = 'SDR';  // Set initial category to SDR
                 
                 // Get available machines for the current category
-                const availableMachines = currentCategory === 'SDR' 
-                    ? Object.keys(machineData[currentCategory])
-                    : Object.keys(machineData[currentCategory]);
+                const availableMachines = Object.keys(machineData[currentCategory]);
                 
                 // Pre-select first two machines
                 selectedMachines = availableMachines.slice(0, 2);
@@ -295,9 +293,7 @@
             selectorsContainer.innerHTML = '';
             
             // Get available machines for the current category
-            const availableMachines = category === 'SDR'
-                ? Object.keys(machineData[category]).filter(key => key.startsWith('BOMAG'))
-                : Object.keys(machineData[category]);
+            const availableMachines = Object.keys(machineData[category]);
             
             // Add initial selectors with first two machines pre-selected
             for (let i = 0; i < 2; i++) {
@@ -400,18 +396,28 @@
             try {
                 if (currentCategory === 'SDR') {
                     return Object.entries(machineData[currentCategory])
-                        .filter(([key]) => key.startsWith('BOMAG')) // Only show BOMAG machines
                         .map(([key, machines]) => {
-                            if (!machines || !Array.isArray(machines) || machines.length === 0) {
-                                console.warn('Invalid machine data for key:', key);
-                                return '';
+                            // Handle BOMAG machines (array structure)
+                            if (key.startsWith('BOMAG')) {
+                                if (!machines || !Array.isArray(machines) || machines.length === 0) {
+                                    console.warn('Invalid BOMAG machine data for key:', key);
+                                    return '';
+                                }
+                                const machine = machines[0];
+                                if (!machine || !machine.Modelo) {
+                                    console.warn('Invalid BOMAG machine data for key:', key);
+                                    return '';
+                                }
+                                return `<option value="${key}">${key} - ${machine.Modelo}</option>`;
                             }
-                            const machine = machines[0];
-                            if (!machine || !machine.Modelo) {
-                                console.warn('Invalid machine data for key:', key);
-                                return '';
+                            // Handle non-BOMAG machines (direct object structure)
+                            else {
+                                if (!machines || !machines.Modelo) {
+                                    console.warn('Invalid non-BOMAG machine data for key:', key);
+                                    return '';
+                                }
+                                return `<option value="${key}">${key} - ${machines.Modelo}</option>`;
                             }
-                            return `<option value="${key}">${key} - ${machine.Modelo}</option>`;
                         })
                         .filter(option => option !== '') // Remove empty options
                         .join('');
@@ -441,7 +447,10 @@
                 'DYNAPAC': 'assets/logos/dynapac.png',
                 'AMMANN': 'assets/logos/ammann.png',
                 'JCB': 'assets/logos/jcb-logo-png_seeklogo-168616.png',
-                'WACKER NEUSON': 'assets/logos/wacker-neuson-logo-png_seeklogo-293001.png'
+                'WACKER NEUSON': 'assets/logos/wacker-neuson-logo-png_seeklogo-293001.png',
+                'SANY': 'assets/logos/sany.png',
+                'XCMG': 'assets/logos/xcmg.png',
+                'NEW': 'assets/logos/new.png'
             };
             return logoMap[manufacturer] || '';
         }
@@ -454,7 +463,10 @@
                 'DYNAPAC': 'assets/LTR/máquina_560fce20.png',
                 'AMMANN': 'assets/LTR/máquina_560fce20.png',
                 'JCB': 'assets/LTR/máquina_560fce20.png',
-                'WACKER NEUSON': 'assets/LTR/máquina_560fce20.png'
+                'WACKER NEUSON': 'assets/LTR/máquina_560fce20.png',
+                'SANY': 'assets/LTR/máquina_560fce20.png',
+                'XCMG': 'assets/LTR/máquina_560fce20.png',
+                'NEW': 'assets/LTR/máquina_560fce20.png'
             };
             return imageMap[manufacturer] || '';
         }
@@ -479,12 +491,22 @@
 
                 // Create machine cards
                 const cardsHTML = selectedModels.map(key => {
-                    const machine = currentCategory === 'SDR' 
-                        ? (machineData[currentCategory][key]?.[0] || {})
-                        : (machineData[currentCategory][key] || {});
-                    const manufacturer = currentCategory === 'SDR' 
-                        ? key.split('_')[0]
-                        : key;
+                    let machine;
+                    let manufacturer;
+                    
+                    if (currentCategory === 'SDR') {
+                        if (key.startsWith('BOMAG')) {
+                            machine = machineData[currentCategory][key]?.[0] || {};
+                            manufacturer = key.split('_')[0];
+                        } else {
+                            machine = machineData[currentCategory][key] || {};
+                            manufacturer = key;
+                        }
+                    } else {
+                        machine = machineData[currentCategory][key] || {};
+                        manufacturer = key;
+                    }
+                    
                     const logoUrl = getLogoUrl(manufacturer);
                     const machineImageUrl = getMachineImageUrl(manufacturer);
                     
@@ -513,12 +535,22 @@
                             <tr>
                                 <th class="text-left">Specification</th>
                                 ${selectedModels.map(key => {
-                                    const machine = currentCategory === 'SDR' 
-                                        ? (machineData[currentCategory][key]?.[0] || {})
-                                        : (machineData[currentCategory][key] || {});
-                                    const manufacturer = currentCategory === 'SDR' 
-                                        ? key.split('_')[0]
-                                        : key;
+                                    let machine;
+                                    let manufacturer;
+                                    
+                                    if (currentCategory === 'SDR') {
+                                        if (key.startsWith('BOMAG')) {
+                                            machine = machineData[currentCategory][key]?.[0] || {};
+                                            manufacturer = key.split('_')[0];
+                                        } else {
+                                            machine = machineData[currentCategory][key] || {};
+                                            manufacturer = key;
+                                        }
+                                    } else {
+                                        machine = machineData[currentCategory][key] || {};
+                                        manufacturer = key;
+                                    }
+                                    
                                     const logoUrl = getLogoUrl(manufacturer);
                                     const machineImageUrl = getMachineImageUrl(manufacturer);
                                     
@@ -529,7 +561,7 @@
                                                      alt="${manufacturer} logo" 
                                                      class="machine-logo mx-auto">
                                             ` : ''}
-                                            <div class="font-semibold">${key}</div>
+                                            <div class="font-semibold">${manufacturer}</div>
                                             <div class="text-sm text-gray-300">${machine.Modelo || '-'}</div>
                                             <img src="${machineImageUrl}" 
                                                  alt="${manufacturer} ${machine.Modelo || ''}" 
@@ -544,9 +576,19 @@
                 `;
 
                 // Get all unique specification keys
-                const firstMachine = currentCategory === 'SDR' 
-                    ? (machineData[currentCategory][selectedModels[0]]?.[0] || {})
-                    : (machineData[currentCategory][selectedModels[0]] || {});
+                const firstKey = selectedModels[0];
+                let firstMachine;
+                
+                if (currentCategory === 'SDR') {
+                    if (firstKey.startsWith('BOMAG')) {
+                        firstMachine = machineData[currentCategory][firstKey]?.[0] || {};
+                    } else {
+                        firstMachine = machineData[currentCategory][firstKey] || {};
+                    }
+                } else {
+                    firstMachine = machineData[currentCategory][firstKey] || {};
+                }
+                
                 const specs = Object.keys(firstMachine).filter(key => key !== 'Tiempo');
                 console.log('Specifications to compare:', specs);
 
@@ -556,9 +598,16 @@
                         <tr>
                             <td class="highlight">${spec}</td>
                             ${selectedModels.map(key => {
-                                const machine = currentCategory === 'SDR' 
-                                    ? (machineData[currentCategory][key]?.[0] || {})
-                                    : (machineData[currentCategory][key] || {});
+                                let machine;
+                                if (currentCategory === 'SDR') {
+                                    if (key.startsWith('BOMAG')) {
+                                        machine = machineData[currentCategory][key]?.[0] || {};
+                                    } else {
+                                        machine = machineData[currentCategory][key] || {};
+                                    }
+                                } else {
+                                    machine = machineData[currentCategory][key] || {};
+                                }
                                 const value = machine[spec] || '-';
                                 return `<td class="text-center">${value}</td>`;
                             }).join('')}
@@ -582,9 +631,16 @@
                             <tr>
                                 <td class="highlight">${tiempo}</td>
                                 ${selectedModels.map(key => {
-                                    const machine = currentCategory === 'SDR' 
-                                        ? (machineData[currentCategory][key]?.[0] || {})
-                                        : (machineData[currentCategory][key] || {});
+                                    let machine;
+                                    if (currentCategory === 'SDR') {
+                                        if (key.startsWith('BOMAG')) {
+                                            machine = machineData[currentCategory][key]?.[0] || {};
+                                        } else {
+                                            machine = machineData[currentCategory][key] || {};
+                                        }
+                                    } else {
+                                        machine = machineData[currentCategory][key] || {};
+                                    }
                                     const value = machine.Tiempo?.[tiempo] || '-';
                                     return `<td class="text-center">${value}</td>`;
                                 }).join('')}
