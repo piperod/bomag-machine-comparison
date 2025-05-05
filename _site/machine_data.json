@@ -197,35 +197,105 @@
     }
   },
   "SDR": {
-    "BOMAG": {
-      "Modelo": "BW211 D5-SL",
-      "Peso (Kg)": 10630,
-      "Motor": "Deutz BF4M 2012 C",
-      "Ancho de compactación (m)": 2.1,
-      "Potencia (HP)": 132,
-      "Amplitud (mm)": "1,80 / 0,95",
-      "Carga Lineal Estática (Kg/cm)": 28.4,
-      "Gradeabilidad (%)": 45,
-      "País de origen": "China",
-      "Asistente de compactación": " BOMAG ECONOMIZER\nSistema visual que permite a los operadores medir el progreso de la compactación en tiempo real. Utiliza una escala LED en la cabina para mostrar el nivel de compactación alcanzado, ayudando a evitar sobrecompacción o subcompactación.",
-      "Telemetría": "Telematics",
-      "Tecnologías Innovadoras": "Economizer, TERRAMETER (Evib real), VARIOCONTROL, ECOMODE, TELEMATIC",
-      "USP": "Operación Intuitiva\n* Un switch para cada función\n* Símbolos intuitivos facilitan la operación\n",
-      "Profundidad de compactación máx (cm) Grava/Arena": 60,
-      "Rendimiento en compactación (m3/h)": "270 - 540",
-      "Consumo de combustible (L/h) Carga 70%": 12.4,
-      "Precio CIF (USD)": 63530.18,
-      "Mantenimiento preventivo (USD/h)": 1,
-      "Mantenimiento correctivo (USD/h)": 2,
-      "TCO (USD)": 128330.18,
-      "Tiempo": "BW211 D5-SL",
-      "0": 29580,
-      "1000": 44980,
-      "1500": 52680,
-      "2000": 60380,
-      "2500": 68080,
-      "3000": 75780
-    },
+    "BOMAG_Cummins 4BT 3.9_100": [
+      {
+        "Modelo": "BW211 D5-SL",
+        "Peso (Kg)": 10630,
+        "Motor": "Cummins 4BT 3.9",
+        "Ancho de compactación (m)": 2.1,
+        "Potencia (HP)": 100,
+        "Amplitud (mm)": "1,80 / 0,95",
+        "Carga Lineal Estática (Kg/cm)": 28.4,
+        "Gradeabilidad (%)": 45,
+        "País de origen": "India",
+        "Asistente de compactación": " BOMAG ECONOMIZER\nSistema visual que permite a los operadores medir el progreso de la compactación en tiempo real. Utiliza una escala LED en la cabina para mostrar el nivel de compactación alcanzado, ayudando a evitar sobrecompacción o subcompactación. ",
+        "Telemetría": "Telematics",
+        "Tecnologías Innovadoras": "Economizer, TERRAMETER (Evib real), VARIOCONTROL, ECOMODE, TELEMATIC",
+        "USP": "Operación Intuitiva\n* Un switch para cada función\n* Símbolos intuitivos facilitan la operación\n",
+        "Profundidad de compactación máx (cm) Grava/Arena": 60,
+        "Rendimiento en compactación (m3/h)": "270 - 540",
+        "Consumo de combustible (L/h) Carga 70%": 11.8,
+        "Precio CIF (USD)": 57592.78,
+        "Mantenimiento preventivo (USD/h)": 1,
+        "Mantenimiento correctivo (USD/h)": 2,
+        "Tiempo de uso (h)": 3000,
+        "TCO (USD)": 119692.78,
+        "Tiempo": {
+          "0": 28000,
+          "1000": 42800,
+          "1500": 50200,
+          "2000": 57600,
+          "2500": 65000,
+          "3000": 72400
+        }
+      }
+    ],
+    "BOMAG_Cummins 4BTAA 3.9_110": [
+      {
+        "Modelo": "BW211 D5-SL",
+        "Peso (Kg)": 10630,
+        "Motor": "Cummins 4BTAA 3.9",
+        "Ancho de compactación (m)": 2.1,
+        "Potencia (HP)": 110,
+        "Amplitud (mm)": "1,80 / 0,95",
+        "Carga Lineal Estática (Kg/cm)": 28.4,
+        "Gradeabilidad (%)": 45,
+        "País de origen": "India",
+        "Asistente de compactación": " BOMAG ECONOMIZER\nSistema visual que permite a los operadores medir el progreso de la compactación en tiempo real. Utiliza una escala LED en la cabina para mostrar el nivel de compactación alcanzado, ayudando a evitar sobrecompacción o subcompactación.",
+        "Telemetría": "Telematics",
+        "Tecnologías Innovadoras": "Economizer, TERRAMETER (Evib real), VARIOCONTROL, ECOMODE, TELEMATIC",
+        "USP": "Operación Intuitiva\n* Un switch para cada función\n* Símbolos intuitivos facilitan la operación\n",
+        "Profundidad de compactación máx (cm) Grava/Arena": 60,
+        "Rendimiento en compactación (m3/h)": "270 - 540",
+        "Consumo de combustible (L/h) Carga 70%": 11.8,
+        "Precio CIF (USD)": 59374,
+        "Mantenimiento preventivo (USD/h)": 1,
+        "Mantenimiento correctivo (USD/h)": 2,
+        "Tiempo de uso (h)": 3000,
+        "TCO (USD)": 121474,
+        "Tiempo": {
+          "0": 29630,
+          "1000": 44430,
+          "1500": 51830,
+          "2000": 59230,
+          "2500": 66630,
+          "3000": 74030
+        }
+      }
+    ],
+    "BOMAG_Deutz BF4M 2012 C_132": [
+      {
+        "Modelo": "BW211 D5-SL",
+        "Peso (Kg)": 10630,
+        "Motor": "Deutz BF4M 2012 C",
+        "Ancho de compactación (m)": 2.1,
+        "Potencia (HP)": 132,
+        "Amplitud (mm)": "1,80 / 0,95",
+        "Carga Lineal Estática (Kg/cm)": 28.4,
+        "Gradeabilidad (%)": 45,
+        "País de origen": "China",
+        "Asistente de compactación": " BOMAG ECONOMIZER\nSistema visual que permite a los operadores medir el progreso de la compactación en tiempo real. Utiliza una escala LED en la cabina para mostrar el nivel de compactación alcanzado, ayudando a evitar sobrecompacción o subcompactación.",
+        "Telemetría": "Telematics",
+        "Tecnologías Innovadoras": "Economizer, TERRAMETER (Evib real), VARIOCONTROL, ECOMODE, TELEMATIC",
+        "USP": "Operación Intuitiva\n* Un switch para cada función\n* Símbolos intuitivos facilitan la operación\n",
+        "Profundidad de compactación máx (cm) Grava/Arena": 60,
+        "Rendimiento en compactación (m3/h)": "270 - 540",
+        "Consumo de combustible (L/h) Carga 70%": 12.4,
+        "Precio CIF (USD)": 63530.18,
+        "Mantenimiento preventivo (USD/h)": 1,
+        "Mantenimiento correctivo (USD/h)": 2,
+        "Tiempo de uso (h)": 3000,
+        "TCO (USD)": 128330.18,
+        "Tiempo": {
+          "0": 29580,
+          "1000": 44980,
+          "1500": 52680,
+          "2000": 60380,
+          "2500": 68080,
+          "3000": 75780
+        }
+      }
+    ],
     "HAMM": {
       "Modelo": "HC110",
       "Peso (Kg)": 11765,
@@ -246,14 +316,16 @@
       "Precio CIF (USD)": 91845.1,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 162045.1,
-      "Tiempo": "HC110",
-      "0": 26783,
-      "1000": 43383,
-      "1500": 51683,
-      "2000": 59983,
-      "2500": 68283,
-      "3000": 76583
+      "Tiempo": {
+        "0": 26783,
+        "1000": 43383,
+        "1500": 51683,
+        "2000": 59983,
+        "2500": 68283,
+        "3000": 76583
+      }
     },
     "DYNAPAC": {
       "Modelo": "CA25 D-Rhino",
@@ -275,14 +347,16 @@
       "Precio CIF (USD)": 90000,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 160200,
-      "Tiempo": "CA25 D-Rhino",
-      "0": 25500,
-      "1000": 42100,
-      "1500": 50400,
-      "2000": 58700,
-      "2500": 67000,
-      "3000": 75300
+      "Tiempo": {
+        "0": 25500,
+        "1000": 42100,
+        "1500": 50400,
+        "2000": 58700,
+        "2500": 67000,
+        "3000": 75300
+      }
     },
     "CATERPILLAR": {
       "Modelo": "CS11GC",
@@ -304,16 +378,18 @@
       "Precio CIF (USD)": 105298.85,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 179548.85,
-      "Tiempo": "CS11GC",
-      "0": 23500,
-      "1000": 41000,
-      "1500": 49750,
-      "2000": 58500,
-      "2500": 67250,
-      "3000": 76000
+      "Tiempo": {
+        "0": 23500,
+        "1000": 41000,
+        "1500": 49750,
+        "2000": 58500,
+        "2500": 67250,
+        "3000": 76000
+      }
     },
-    "NEW HOLLAND": {
+    "NEW": {
       "Modelo": "V110",
       "Peso (Kg)": 11380,
       "Motor": "S8000 4-stroke",
@@ -332,14 +408,16 @@
       "Precio CIF (USD)": 71600,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 127850,
-      "Tiempo": "V110",
-      "0": 23500,
-      "1000": 37000,
-      "1500": 43750,
-      "2000": 50500,
-      "2500": 57250,
-      "3000": 64000
+      "Tiempo": {
+        "0": 23500,
+        "1000": 37000,
+        "1500": 43750,
+        "2000": 50500,
+        "2500": 57250,
+        "3000": 64000
+      }
     },
     "SANY": {
       "Modelo": "SSR120C-10S",
@@ -360,14 +438,16 @@
       "Precio CIF (USD)": 56392,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 134242,
-      "Tiempo": "SSR120C-10S",
-      "0": 23500,
-      "1000": 41800,
-      "1500": 50950,
-      "2000": 60100,
-      "2500": 69250,
-      "3000": 78400
+      "Tiempo": {
+        "0": 23500,
+        "1000": 41800,
+        "1500": 50950,
+        "2000": 60100,
+        "2500": 69250,
+        "3000": 78400
+      }
     },
     "XCMG": {
       "Modelo": "XS123",
@@ -388,14 +468,16 @@
       "Precio CIF (USD)": 54786,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 124986,
-      "Tiempo": "XS123",
-      "0": 23500,
-      "1000": 40100,
-      "1500": 48400,
-      "2000": 56700,
-      "2500": 65000,
-      "3000": 73300
+      "Tiempo": {
+        "0": 23500,
+        "1000": 40100,
+        "1500": 48400,
+        "2000": 56700,
+        "2500": 65000,
+        "3000": 73300
+      }
     },
     "AMMANN": {
       "Modelo": "ASC110",
@@ -416,14 +498,16 @@
       "Precio CIF (USD)": 89930,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 172280,
-      "Tiempo": "ASC110",
-      "0": 23500,
-      "1000": 42800,
-      "1500": 52450,
-      "2000": 62100,
-      "2500": 71750,
-      "3000": 81400
+      "Tiempo": {
+        "0": 23500,
+        "1000": 42800,
+        "1500": 52450,
+        "2000": 62100,
+        "2500": 71750,
+        "3000": 81400
+      }
     },
     "JCB": {
       "Modelo": "116D",
@@ -444,14 +528,16 @@
       "Precio CIF (USD)": 84076,
       "Mantenimiento preventivo (USD/h)": 1,
       "Mantenimiento correctivo (USD/h)": 2,
+      "Tiempo de uso (h)": 3000,
       "TCO (USD)": 151576,
-      "Tiempo": "116D",
-      "0": 23500,
-      "1000": 39500,
-      "1500": 47500,
-      "2000": 55500,
-      "2500": 63500,
-      "3000": 71500
+      "Tiempo": {
+        "0": 23500,
+        "1000": 39500,
+        "1500": 47500,
+        "2000": 55500,
+        "2500": 63500,
+        "3000": 71500
+      }
     }
   },
   "HTR": {
@@ -553,7 +639,7 @@
       "Engine": "Cummins QSB 3,3-C99",
       "Compaction Width (m)": 1.9,
       "Power (HP)": 99.2,
-      "Number of wheels": 8,
+      "Number of wheels ": 8,
       "Tyre Overlap (mm)": 50
     },
     "BOMAG": {
@@ -562,7 +648,7 @@
       "Engine": "Deutz TCD 2012 L04 2V",
       "Compaction Width (m)": 2.042,
       "Power (HP)": 100,
-      "Number of wheels": 8,
+      "Number of wheels ": 8,
       "Tyre Overlap (mm)": 42
     },
     "CATERPILLAR": {
@@ -571,7 +657,7 @@
       "Engine": "C4.4",
       "Compaction Width (m)": 2.09,
       "Power (HP)": 129,
-      "Number of wheels": 8,
+      "Number of wheels ": 8,
       "Tyre Overlap (mm)": 42
     },
     "DYNAPAC": {
@@ -580,7 +666,7 @@
       "Engine": "Cummins QSF 3.8",
       "Compaction Width (m)": 2.3,
       "Power (HP)": 110,
-      "Number of wheels": 5,
+      "Number of wheels ": 5,
       "Tyre Overlap (mm)": 42,
       "Origin country": "Brazil"
     },
@@ -590,7 +676,7 @@
       "Engine": "Deutz TCD 2012 L04 2V",
       "Compaction Width (m)": 2.08,
       "Power (HP)": 113.9,
-      "Number of wheels": 8
+      "Number of wheels ": 8
     }
   },
   "W200CF": {

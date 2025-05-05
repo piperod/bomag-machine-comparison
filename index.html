@@ -207,16 +207,23 @@
                 machineData = data;
                 initializeTabs();
                 
-                // Pre-select HAMM and Caterpillar machines for comparison
-                currentCategory = 'LTR';  // Set initial category
-                selectedMachines = ['HAMM', 'CATERPILLAR'];  // Pre-select these manufacturers
+                // Set initial category and pre-select machines based on category
+                currentCategory = 'SDR';  // Set initial category to SDR
+                
+                // Get available machines for the current category
+                const availableMachines = currentCategory === 'SDR' 
+                    ? Object.keys(machineData[currentCategory])
+                    : Object.keys(machineData[currentCategory]);
+                
+                // Pre-select first two machines
+                selectedMachines = availableMachines.slice(0, 2);
                 
                 // Update UI to reflect pre-selected machines
                 const selectorsContainer = document.getElementById('machineSelectors');
                 selectorsContainer.innerHTML = '';  // Clear existing selectors
                 
                 // Add selectors for pre-selected machines
-                selectedMachines.forEach((manufacturer, index) => {
+                selectedMachines.forEach((machine, index) => {
                     const selectorId = `machine-selector-${Date.now() + index}`;
                     const selectorHTML = `
                         <div class="machine-card bg-white rounded-lg shadow-sm p-4 w-full md:w-64 relative" id="${selectorId}">
@@ -239,7 +246,7 @@
                     
                     // Set the selected value
                     const select = document.querySelector(`#${selectorId} select`);
-                    select.value = manufacturer;
+                    select.value = machine;
                 });
                 
                 // Compare the pre-selected machines
@@ -287,14 +294,47 @@
             const selectorsContainer = document.getElementById('machineSelectors');
             selectorsContainer.innerHTML = '';
             
-            // Add initial selectors
-            addMachineSelector();
-            addMachineSelector();
+            // Get available machines for the current category
+            const availableMachines = category === 'SDR'
+                ? Object.keys(machineData[category]).filter(key => key.startsWith('BOMAG'))
+                : Object.keys(machineData[category]);
+            
+            // Add initial selectors with first two machines pre-selected
+            for (let i = 0; i < 2; i++) {
+                const selectorId = `machine-selector-${Date.now() + i}`;
+                const machine = availableMachines[i] || '';
+                selectedMachines.push(machine);
+                
+                const selectorHTML = `
+                    <div class="machine-card bg-white rounded-lg shadow-sm p-4 w-full md:w-64 relative" id="${selectorId}">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-medium text-bomag-dark">Machine ${i + 1}</h3>
+                        </div>
+                        <select class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-bomag-yellow focus:border-transparent"
+                                onchange="selectMachine('${selectorId}', this.value)">
+                            <option value="">Select a machine...</option>
+                            ${getMachineOptions()}
+                        </select>
+                    </div>
+                `;
+                selectorsContainer.insertAdjacentHTML('beforeend', selectorHTML);
+                
+                // Set the selected value if a machine is available
+                if (machine) {
+                    const select = document.querySelector(`#${selectorId} select`);
+                    select.value = machine;
+                }
+            }
 
             // Clear comparison results
             document.getElementById('comparisonResults').innerHTML = '';
             document.getElementById('machineCardsContainer').classList.add('hidden');
             document.getElementById('noSelectionMessage').classList.add('hidden');
+            
+            // Compare machines if we have at least two selected
+            if (selectedMachines.filter(m => m).length >= 2) {
+                compareMachines();
+            }
         }
 
         function addMachineSelector() {
@@ -325,6 +365,10 @@
             document.getElementById('machineSelectors').insertAdjacentHTML('beforeend', selectorHTML);
             selectedMachines.push(''); // Add empty string for the new selector
             console.log('Added new selector, selectedMachines:', selectedMachines);
+            
+            // Update the select element with available options
+            const select = document.querySelector(`#${selectorId} select`);
+            select.innerHTML = `<option value="">Select a machine...</option>${getMachineOptions()}`;
         }
 
         function removeMachineSelector(selectorId) {
@@ -353,9 +397,40 @@
                 return '';
             }
             
-            return Object.entries(machineData[currentCategory])
-                .map(([manufacturer, data]) => `<option value="${manufacturer}">${manufacturer} - ${data.Modelo}</option>`)
-                .join('');
+            try {
+                if (currentCategory === 'SDR') {
+                    return Object.entries(machineData[currentCategory])
+                        .filter(([key]) => key.startsWith('BOMAG')) // Only show BOMAG machines
+                        .map(([key, machines]) => {
+                            if (!machines || !Array.isArray(machines) || machines.length === 0) {
+                                console.warn('Invalid machine data for key:', key);
+                                return '';
+                            }
+                            const machine = machines[0];
+                            if (!machine || !machine.Modelo) {
+                                console.warn('Invalid machine data for key:', key);
+                                return '';
+                            }
+                            return `<option value="${key}">${key} - ${machine.Modelo}</option>`;
+                        })
+                        .filter(option => option !== '') // Remove empty options
+                        .join('');
+                } else {
+                    return Object.entries(machineData[currentCategory])
+                        .map(([manufacturer, data]) => {
+                            if (!data || !data.Modelo) {
+                                console.warn('Invalid machine data for manufacturer:', manufacturer);
+                                return '';
+                            }
+                            return `<option value="${manufacturer}">${manufacturer} - ${data.Modelo}</option>`;
+                        })
+                        .filter(option => option !== '') // Remove empty options
+                        .join('');
+                }
+            } catch (error) {
+                console.error('Error generating machine options:', error);
+                return '';
+            }
         }
 
         function getLogoUrl(manufacturer) {
@@ -397,116 +472,141 @@
                 return;
             }
 
-            console.log('Showing comparison for category:', currentCategory);
-            document.getElementById('noSelectionMessage').classList.add('hidden');
-            document.getElementById('machineCardsContainer').classList.remove('hidden');
+            try {
+                console.log('Showing comparison for category:', currentCategory);
+                document.getElementById('noSelectionMessage').classList.add('hidden');
+                document.getElementById('machineCardsContainer').classList.remove('hidden');
 
-            // Create machine cards
-            const cardsHTML = selectedModels.map(manufacturer => {
-                const machine = machineData[currentCategory][manufacturer];
-                const logoUrl = getLogoUrl(manufacturer);
-                const machineImageUrl = getMachineImageUrl(manufacturer);
-                
-                return `
-                    <div class="machine-card">
-                        ${logoUrl ? `
-                            <img src="${logoUrl}" 
-                                 alt="${manufacturer} logo" 
-                                 class="machine-logo mx-auto">
-                        ` : ''}
-                        <h3 class="machine-name">${manufacturer}</h3>
-                        <p class="machine-model">${machine.Modelo}</p>
-                        <img src="${machineImageUrl}" 
-                             alt="${manufacturer} ${machine.Modelo}" 
-                             class="machine-image"
-                             onerror="this.onerror=null; this.src=''">
-                    </div>
-                `;
-            }).join('');
-            document.getElementById('machineCards').innerHTML = cardsHTML;
+                // Create machine cards
+                const cardsHTML = selectedModels.map(key => {
+                    const machine = currentCategory === 'SDR' 
+                        ? (machineData[currentCategory][key]?.[0] || {})
+                        : (machineData[currentCategory][key] || {});
+                    const manufacturer = currentCategory === 'SDR' 
+                        ? key.split('_')[0]
+                        : key;
+                    const logoUrl = getLogoUrl(manufacturer);
+                    const machineImageUrl = getMachineImageUrl(manufacturer);
+                    
+                    return `
+                        <div class="machine-card">
+                            ${logoUrl ? `
+                                <img src="${logoUrl}" 
+                                     alt="${manufacturer} logo" 
+                                     class="machine-logo mx-auto">
+                            ` : ''}
+                            <h3 class="machine-name">${manufacturer}</h3>
+                            <p class="machine-model">${machine.Modelo || '-'}</p>
+                            <img src="${machineImageUrl}" 
+                                 alt="${manufacturer} ${machine.Modelo || ''}" 
+                                 class="machine-image"
+                                 onerror="this.onerror=null; this.src=''">
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('machineCards').innerHTML = cardsHTML;
 
-            // Create comparison table
-            let tableHTML = `
-                <table class="comparison-table w-full">
-                    <thead>
-                        <tr>
-                            <th class="text-left">Specification</th>
-                            ${selectedModels.map(manufacturer => {
-                                const machine = machineData[currentCategory][manufacturer];
-                                const logoUrl = getLogoUrl(manufacturer);
-                                const machineImageUrl = getMachineImageUrl(manufacturer);
-                                
-                                return `
-                                    <th class="text-center">
-                                        ${logoUrl ? `
-                                            <img src="${logoUrl}" 
-                                                 alt="${manufacturer} logo" 
-                                                 class="machine-logo mx-auto">
-                                        ` : ''}
-                                        <div class="font-semibold">${manufacturer}</div>
-                                        <div class="text-sm text-gray-300">${machine.Modelo}</div>
-                                        <img src="${machineImageUrl}" 
-                                             alt="${manufacturer} ${machine.Modelo}" 
-                                             class="machine-image"
-                                             onerror="this.onerror=null; this.src=''">
-                                    </th>
-                                `;
-                            }).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            // Get all unique specification keys
-            const firstMachine = machineData[currentCategory][selectedModels[0]];
-            const specs = Object.keys(firstMachine).filter(key => key !== 'Tiempo');
-            console.log('Specifications to compare:', specs);
-
-            // Add regular specifications
-            specs.forEach(spec => {
-                tableHTML += `
-                    <tr>
-                        <td class="highlight">${spec}</td>
-                        ${selectedModels.map(manufacturer => {
-                            const machine = machineData[currentCategory][manufacturer];
-                            const value = machine[spec] || '-';
-                            return `<td class="text-center">${value}</td>`;
-                        }).join('')}
-                    </tr>
-                `;
-            });
-
-            // Add Tiempo section if it exists
-            if (firstMachine.Tiempo) {
-                console.log('Adding Tiempo section');
-                tableHTML += `
-                    <tr>
-                        <td colspan="${selectedModels.length + 1}" class="section-header">
-                            Tiempo
-                        </td>
-                    </tr>
+                // Create comparison table
+                let tableHTML = `
+                    <table class="comparison-table w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Specification</th>
+                                ${selectedModels.map(key => {
+                                    const machine = currentCategory === 'SDR' 
+                                        ? (machineData[currentCategory][key]?.[0] || {})
+                                        : (machineData[currentCategory][key] || {});
+                                    const manufacturer = currentCategory === 'SDR' 
+                                        ? key.split('_')[0]
+                                        : key;
+                                    const logoUrl = getLogoUrl(manufacturer);
+                                    const machineImageUrl = getMachineImageUrl(manufacturer);
+                                    
+                                    return `
+                                        <th class="text-center">
+                                            ${logoUrl ? `
+                                                <img src="${logoUrl}" 
+                                                     alt="${manufacturer} logo" 
+                                                     class="machine-logo mx-auto">
+                                            ` : ''}
+                                            <div class="font-semibold">${key}</div>
+                                            <div class="text-sm text-gray-300">${machine.Modelo || '-'}</div>
+                                            <img src="${machineImageUrl}" 
+                                                 alt="${manufacturer} ${machine.Modelo || ''}" 
+                                                 class="machine-image"
+                                                 onerror="this.onerror=null; this.src=''">
+                                        </th>
+                                    `;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
 
-                Object.keys(firstMachine.Tiempo).forEach(tiempo => {
+                // Get all unique specification keys
+                const firstMachine = currentCategory === 'SDR' 
+                    ? (machineData[currentCategory][selectedModels[0]]?.[0] || {})
+                    : (machineData[currentCategory][selectedModels[0]] || {});
+                const specs = Object.keys(firstMachine).filter(key => key !== 'Tiempo');
+                console.log('Specifications to compare:', specs);
+
+                // Add regular specifications
+                specs.forEach(spec => {
                     tableHTML += `
                         <tr>
-                            <td class="highlight">${tiempo}</td>
-                            ${selectedModels.map(manufacturer => {
-                                const machine = machineData[currentCategory][manufacturer];
-                                const value = machine.Tiempo[tiempo] || '-';
+                            <td class="highlight">${spec}</td>
+                            ${selectedModels.map(key => {
+                                const machine = currentCategory === 'SDR' 
+                                    ? (machineData[currentCategory][key]?.[0] || {})
+                                    : (machineData[currentCategory][key] || {});
+                                const value = machine[spec] || '-';
                                 return `<td class="text-center">${value}</td>`;
                             }).join('')}
                         </tr>
                     `;
                 });
-            }
 
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-            console.log('Setting comparison results');
-            document.getElementById('comparisonResults').innerHTML = tableHTML;
+                // Add Tiempo section if it exists
+                if (firstMachine.Tiempo) {
+                    console.log('Adding Tiempo section');
+                    tableHTML += `
+                        <tr>
+                            <td colspan="${selectedModels.length + 1}" class="section-header">
+                                Tiempo
+                            </td>
+                        </tr>
+                    `;
+
+                    Object.keys(firstMachine.Tiempo).forEach(tiempo => {
+                        tableHTML += `
+                            <tr>
+                                <td class="highlight">${tiempo}</td>
+                                ${selectedModels.map(key => {
+                                    const machine = currentCategory === 'SDR' 
+                                        ? (machineData[currentCategory][key]?.[0] || {})
+                                        : (machineData[currentCategory][key] || {});
+                                    const value = machine.Tiempo?.[tiempo] || '-';
+                                    return `<td class="text-center">${value}</td>`;
+                                }).join('')}
+                            </tr>
+                        `;
+                    });
+                }
+
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                console.log('Setting comparison results');
+                document.getElementById('comparisonResults').innerHTML = tableHTML;
+            } catch (error) {
+                console.error('Error comparing machines:', error);
+                document.getElementById('comparisonResults').innerHTML = `
+                    <div class="text-red-500 p-4">
+                        <p>Error comparing machines. Please check the console for details.</p>
+                    </div>
+                `;
+            }
         }
 
         // Add event listener for add machine button

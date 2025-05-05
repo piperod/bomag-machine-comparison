@@ -98,7 +98,7 @@ def sheet_to_records(df: pd.DataFrame, sheet_name: str) -> Dict[str, Dict[str, A
 
     # Sheets other than LTR → simple, flat parsing
     if sheet_name.upper() != "LTR":
-        return _flat_records(df, attr_col, maquina_row, machine_series)
+        return _flat_records(df, attr_col, maquina_row, machine_series, sheet_name)
 
     # 2️⃣ LTR‑specific logic — detect Tiempo block
     tiempo_start, tiempo_end = _find_tiempo_block(df, attr_col, maquina_row)
@@ -165,25 +165,63 @@ def _flat_records(
     df: pd.DataFrame,
     attr_col: int,
     maquina_row: int,
-    machine_series: pd.Series
+    machine_series: pd.Series,
+    sheet_name: str
 ) -> Dict[str, Dict[str, Any]]:
     """Default parser for sheets without special sections."""
     machine_cols = machine_series.index
     out: Dict[str, Dict[str, Any]] = {}
-    for mcol in machine_cols:
-        mname = str(machine_series[mcol]).strip()
-        if not mname:
-            continue
-        rec: Dict[str, Any] = {}
-        for idx in range(maquina_row, len(df)):
-            attr = df.loc[idx, attr_col]
-            if _is_nan(attr):
+    
+    # For SDR tab, we'll group machines by brand
+    if sheet_name == "SDR":
+        brand_machines: Dict[str, list] = {}
+        for mcol in machine_cols:
+            mname = str(machine_series[mcol]).strip()
+            if not mname:
                 continue
-            val = df.loc[idx, mcol]
-            if _is_nan(val):
+                
+            # Extract brand and model
+            parts = mname.split(' ', 1)
+            if len(parts) == 2:
+                brand, model = parts
+            else:
+                brand = mname
+                model = mname
+                
+            rec: Dict[str, Any] = {}
+            for idx in range(maquina_row, len(df)):
+                attr = df.loc[idx, attr_col]
+                if _is_nan(attr):
+                    continue
+                val = df.loc[idx, mcol]
+                if _is_nan(val):
+                    continue
+                rec[str(attr).strip()] = _coerce_number(val)
+                
+            if brand not in brand_machines:
+                brand_machines[brand] = []
+            brand_machines[brand].append(rec)
+            
+        # Convert the brand_machines dictionary to the expected format
+        for brand, machines in brand_machines.items():
+            out[brand] = machines
+    else:
+        # For other tabs, keep the original behavior
+        for mcol in machine_cols:
+            mname = str(machine_series[mcol]).strip()
+            if not mname:
                 continue
-            rec[str(attr).strip()] = _coerce_number(val)
-        out[mname] = rec
+            rec: Dict[str, Any] = {}
+            for idx in range(maquina_row, len(df)):
+                attr = df.loc[idx, attr_col]
+                if _is_nan(attr):
+                    continue
+                val = df.loc[idx, mcol]
+                if _is_nan(val):
+                    continue
+                rec[str(attr).strip()] = _coerce_number(val)
+            out[mname] = rec
+            
     return out
 
 
